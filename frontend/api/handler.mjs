@@ -275,11 +275,22 @@ const routes = [
   },
 ];
 
+// Vercel rewrites deliver the real route in the `path` query parameter
+// (catch-all gives an array, rewrite gives a string) while event.path collapses
+// to the rewrite target, so the parameter is the only trustworthy source.
+const resolvePath = (event, query) => {
+  const param = event.queryStringParameters?.path ?? query.get('path');
+  const suffix = String(Array.isArray(param) ? param.join('/') : (param || ''))
+    .replace(/^\/+|\/+$/g, '');
+  if (suffix) return `/api/${suffix}`;
+  const eventPath = String(event.path || event.rawUrl || '').replace(/^\/+|\/+$/g, '');
+  return eventPath ? `/api/${eventPath.replace(/^api\//, '')}` : '/api';
+};
+
 export const handler = async (event) => {
   const started = Date.now();
-  const path = event.path || event.rawUrl || '/';
-  const cleanPath = path.replace(/\/+$/, '') || '/';
   const query = new URLSearchParams(event.rawQueryString || '');
+  const cleanPath = resolvePath(event, query);
 
   if (cleanPath === '/api/v1/health') {
     return json(200, { status: 'UP', dataSource: 'mock', tookMs: Date.now() - started });
