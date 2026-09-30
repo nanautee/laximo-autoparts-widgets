@@ -1,4 +1,5 @@
-﻿import { handler } from '../frontend/api/handler.mjs';
+import { handler } from '../frontend/lib/api/handler.mjs';
+import vercelHandler from '../frontend/api/index.js';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
@@ -18,7 +19,7 @@ const call = async (httpMethod, url, body) => {
 };
 
 (async () => {
-  const fixture = JSON.parse(readFileSync(new URL('../frontend/api/_fixture.json', import.meta.url), 'utf8'));
+  const fixture = JSON.parse(readFileSync(new URL('../frontend/lib/api/_fixture.json', import.meta.url), 'utf8'));
 
   console.log('fixture integrity');
   check('every catalogTemplate key is reachable from ROOT', () => {
@@ -143,6 +144,66 @@ const call = async (httpMethod, url, body) => {
     body: null, isBase64Encoded: false,
   });
   check('catch-all: array path param resolves', () => assert.equal(caught.statusCode, 200));
+
+  console.log('vercel runtime contract');
+  // Vercel's Node runtime only completes a request once res.end() is called.
+  // An entrypoint that merely returns a value hangs until the 300s timeout.
+  const { Readable } = await import('node:stream');
+  const invoke = async (method, url, body) => {
+    const parsed = new URL(url, 'http://localhost');
+    const req = Readable.from(body === undefined ? [] : [JSON.stringify(body)]);
+    req.method = method;
+    req.url = url;
+    req.headers = { 'content-type': 'application/json' };
+    req.query = { ...Object.fromEntries(parsed.searchParams) };
+    if (url.startsWith('/api/handler?path=') || url.startsWith('/api/index?path=')) {
+      req.path = undefined;
+    }
+    let ended = false;
+    let payload = null;
+    const res = {
+      statusCode: 0,
+      setHeader() {},
+      end(chunk) { ended = true; payload = chunk; },
+    };
+    // The rewrite target must arrive as the pathname, with the route in ?path=.
+    if (parsed.pathname === '/api/handler' || parsed.pathname === '/api/index') {
+      req.url = url;
+    }
+    await vercelHandler(req, res);
+    return { ended, status: res.statusCode, body: payload === null ? null : JSON.parse(payload) };
+  };
+
+  const vHealth = await invoke('GET', '/api/index?path=v1/health');
+  check('entrypoint ends the response (no 300s hang)', () => {
+    assert.equal(vHealth.ended, true, 'res.end() was never called');
+  });
+  check('entrypoint returns 200 UP', () => {
+    assert.equal(vHealth.status, 200);
+    assert.equal(vHealth.body.status, 'UP');
+  });
+
+  const vVin = await invoke('GET', '/api/index?path=v1/vehicles/decode&vin=1HGBH41JXMN109186');
+  check('entrypoint resolves VIN through the rewrite param', () => {
+    assert.equal(vVin.ended, true);
+    assert.equal(vVin.status, 200);
+    assert.ok(vVin.body.vehicle);
+  });
+
+  const vCart = await invoke('POST', '/api/index?path=v1/cart/add', {
+    vehicleId: '1HGBH41JXMN109186', partNumber: '5556597375', quantity: 2,
+  });
+  check('entrypoint reads a POST body and responds', () => {
+    assert.equal(vCart.ended, true);
+    assert.ok(vCart.status === 200 || vCart.status === 400, `status ${vCart.status}`);
+  });
+
+  const vMissing = await invoke('GET', '/api/index?path=v1/nope');
+  check('entrypoint maps unknown routes to a JSON 404', () => {
+    assert.equal(vMissing.ended, true);
+    assert.equal(vMissing.status, 404);
+    assert.equal(vMissing.body.code, 'NOT_FOUND');
+  });
 
   console.log(`\n${passed} passed`);
 })();

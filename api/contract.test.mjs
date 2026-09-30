@@ -1,5 +1,5 @@
-﻿import assert from 'node:assert/strict';
-import { handler } from '../frontend/api/handler.mjs';
+import assert from 'node:assert/strict';
+import { handler } from '../frontend/lib/api/handler.mjs';
 
 const BASE = 'http://localhost:8080';
 
@@ -60,10 +60,10 @@ const CASES = [
 ];
 
 const BODIES = [
-  [{ sessionId: 'widget-demo-1', items: [{ oem: '34116860114', brand: 'BMW', name: 'Р”РёСЃРє С‚РѕСЂРјРѕР·РЅРѕР№ Р·Р°РґРЅРёР№', quantity: 2, price: 6240, vehicleId: 'VF-318I-2008' }] }],
+  [{ sessionId: 'widget-demo-1', items: [{ oem: '34116860114', brand: 'BMW', name: 'Диск тормозной задний', quantity: 2, price: 6240, vehicleId: 'VF-318I-2008' }] }],
   [{ sessionId: 'x', items: [] }],
   [{ items: [{ oem: '1' }] }],
-  [{ sessionId: 'y', items: [{ oem: '13547552107', name: 'Р‘Р»РѕРє СѓРїСЂР°РІР»РµРЅРёСЏ РґРІРёРіР°С‚РµР»РµРј', quantity: 1, price: 32000 }] }],
+  [{ sessionId: 'y', items: [{ oem: '13547552107', name: 'Блок управления двигателем', quantity: 1, price: 32000 }] }],
 ];
 
 /**
