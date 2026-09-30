@@ -1,0 +1,38 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: autoparts-redis
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    container_name: autoparts-backend
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      PORT: 8080
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # Demo defaults: fixtures instead of the paid Laximo API, simulated ABCP cart.
+      MOCK_ENABLED: "true"
+      CACHE_ENABLED: "true"
+      # Switch to the live integration:
+      # MOCK_ENABLED: "false"
+      # LAXIMO_ENDPOINT: "https://axam.laximo.com/soap/"
+      # LAXIMO_USERNAME: "..."
+      # LAXIMO_PASSWORD: "..."
+      # LAXIMO_TRADE_ID: "..."
+      # ABCP_API_KEY: "..."
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

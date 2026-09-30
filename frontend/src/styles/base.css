@@ -1,0 +1,380 @@
+/* ==========================================================================
+   Autoparts Widgets - design tokens
+   A widget is meant to live inside someone else's shop page, so every visual
+   decision is expressed as a CSS variable that a host page can override.
+   ========================================================================== */
+
+:root {
+  /* Brand palette */
+  --ap-primary: #4f46e5;
+  --ap-primary-hover: #4338ca;
+  --ap-primary-soft: #eef2ff;
+  --ap-primary-border: #c7d2fe;
+  --ap-accent: #f97316;
+
+  /* Neutrals */
+  --ap-bg: #f6f7fb;
+  --ap-surface: #ffffff;
+  --ap-surface-2: #fafbff;
+  --ap-border: #e6e8f0;
+  --ap-border-strong: #d3d7e4;
+  --ap-text: #131722;
+  --ap-text-soft: #5a6172;
+  --ap-text-muted: #8b91a3;
+
+  /* Status */
+  --ap-success: #0f9d58;
+  --ap-success-soft: #e7f7ef;
+  --ap-warning: #b45309;
+  --ap-warning-soft: #fef4e6;
+  --ap-danger: #d92d20;
+  --ap-danger-soft: #fdeceb;
+
+  /* Shape */
+  --ap-radius-sm: 8px;
+  --ap-radius: 14px;
+  --ap-radius-lg: 20px;
+  --ap-radius-pill: 999px;
+
+  /* Elevation */
+  --ap-shadow-xs: 0 1px 2px rgba(19, 23, 34, 0.06);
+  --ap-shadow-sm: 0 2px 8px rgba(19, 23, 34, 0.07);
+  --ap-shadow: 0 10px 30px rgba(19, 23, 34, 0.1);
+  --ap-shadow-lg: 0 24px 60px rgba(19, 23, 34, 0.18);
+
+  /* Rhythm */
+  --ap-gap: 16px;
+  --ap-pad: 20px;
+  --ap-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif;
+  --ap-mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
+  --ap-transition: 160ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ap-bg: #0b0d14;
+    --ap-surface: #141824;
+    --ap-surface-2: #1b2030;
+    --ap-border: #262c3d;
+    --ap-border-strong: #333b52;
+    --ap-text: #eef1f8;
+    --ap-text-soft: #a8b0c4;
+    --ap-text-muted: #79819a;
+    --ap-primary: #818cf8;
+    --ap-primary-hover: #a5b4fc;
+    --ap-primary-soft: #1e2340;
+    --ap-primary-border: #3b4270;
+    --ap-success: #34d399;
+    --ap-success-soft: #10291f;
+    --ap-warning: #fbbf24;
+    --ap-warning-soft: #2c2410;
+    --ap-danger: #f87171;
+    --ap-danger-soft: #2c1618;
+    --ap-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --ap-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    --ap-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* ==========================================================================
+   Base / shared primitives
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.ap-card {
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius-lg);
+  box-shadow: var(--ap-shadow-sm);
+  overflow: hidden;
+}
+
+.ap-card__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: var(--ap-pad);
+  border-bottom: 1px solid var(--ap-border);
+  background: linear-gradient(180deg, var(--ap-surface-2), var(--ap-surface));
+}
+
+.ap-card__icon {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary);
+  border: 1px solid var(--ap-primary-border);
+}
+
+.ap-card__titles {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ap-card__title {
+  margin: 0;
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ap-text);
+}
+
+.ap-card__subtitle {
+  margin: 2px 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ap-text-soft);
+}
+
+.ap-card__body {
+  padding: var(--ap-pad);
+}
+
+.ap-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border: 1px solid transparent;
+  border-radius: var(--ap-radius);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--ap-transition), border-color var(--ap-transition),
+    color var(--ap-transition), transform var(--ap-transition), box-shadow var(--ap-transition);
+}
+
+.ap-btn:focus-visible {
+  outline: 2px solid var(--ap-primary);
+  outline-offset: 2px;
+}
+
+.ap-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ap-btn:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.ap-btn--primary {
+  background: var(--ap-primary);
+  color: #fff;
+  box-shadow: var(--ap-shadow-xs);
+}
+
+.ap-btn--primary:not(:disabled):hover {
+  background: var(--ap-primary-hover);
+}
+
+.ap-btn--ghost {
+  background: transparent;
+  color: var(--ap-text-soft);
+  border-color: var(--ap-border-strong);
+}
+
+.ap-btn--ghost:not(:disabled):hover {
+  color: var(--ap-text);
+  border-color: var(--ap-primary);
+  background: var(--ap-primary-soft);
+}
+
+.ap-btn--block {
+  width: 100%;
+}
+
+.ap-input {
+  width: 100%;
+  padding: 13px 15px;
+  font: inherit;
+  font-size: 0.9375rem;
+  color: var(--ap-text);
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-border-strong);
+  border-radius: var(--ap-radius);
+  transition: border-color var(--ap-transition), box-shadow var(--ap-transition);
+}
+
+.ap-input::placeholder {
+  color: var(--ap-text-muted);
+}
+
+.ap-input:focus {
+  outline: none;
+  border-color: var(--ap-primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ap-primary) 18%, transparent);
+}
+
+.ap-input--mono {
+  font-family: var(--ap-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ap-label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ap-text-muted);
+}
+
+/* Chips / badges ------------------------------------------------------- */
+
+.ap-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--ap-radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5;
+  background: var(--ap-surface-2);
+  border: 1px solid var(--ap-border);
+  color: var(--ap-text-soft);
+  white-space: nowrap;
+}
+
+.ap-chip--primary {
+  background: var(--ap-primary-soft);
+  border-color: var(--ap-primary-border);
+  color: var(--ap-primary);
+}
+
+.ap-chip--success {
+  background: var(--ap-success-soft);
+  border-color: color-mix(in srgb, var(--ap-success) 35%, transparent);
+  color: var(--ap-success);
+}
+
+.ap-chip--warning {
+  background: var(--ap-warning-soft);
+  border-color: color-mix(in srgb, var(--ap-warning) 35%, transparent);
+  color: var(--ap-warning);
+}
+
+.ap-chip--danger {
+  background: var(--ap-danger-soft);
+  border-color: color-mix(in srgb, var(--ap-danger) 35%, transparent);
+  color: var(--ap-danger);
+}
+
+.ap-chip--mono {
+  font-family: var(--ap-mono);
+  letter-spacing: 0.02em;
+}
+
+/* Feedback states ------------------------------------------------------ */
+
+.ap-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 34px 20px;
+  text-align: center;
+  color: var(--ap-text-soft);
+}
+
+.ap-state__icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary);
+}
+
+.ap-state--error .ap-state__icon {
+  background: var(--ap-danger-soft);
+  color: var(--ap-danger);
+}
+
+.ap-state__title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--ap-text);
+}
+
+.ap-state__hint {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.ap-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--ap-surface-2);
+  border-radius: var(--ap-radius-sm);
+}
+
+.ap-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--ap-text) 8%, transparent),
+    transparent
+  );
+  animation: ap-shimmer 1.4s infinite;
+}
+
+@keyframes ap-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.ap-spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ap-spin 0.7s linear infinite;
+}
+
+@keyframes ap-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

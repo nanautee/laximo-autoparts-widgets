@@ -1,0 +1,95 @@
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+
+spring:
+  application:
+    name: autoparts-hub
+  main:
+    banner-mode: off
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 3s
+      connect-timeout: 3s
+  cache:
+    type: redis
+  codec:
+    max-in-memory-size: 4MB
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+  cloud:
+    circuitbreaker:
+      enabled: true
+
+# ---------------------------------------------------------------------------
+# Autoparts Hub configuration
+# ---------------------------------------------------------------------------
+autoparts:
+  # Mock mode serves realistic fixture data so the demo works without
+  # paid Laximo credentials. Disable in production.
+  mock:
+    enabled: ${MOCK_ENABLED:true}
+
+  laximo:
+    # Laximo exposes a classic SOAP API (AXAM / VehicleSelector, Catalog,
+    # CrossReference services). WSDLs are provided with the paid access.
+    endpoint: ${LAXIMO_ENDPOINT:https://axam.laximo.com/soap/}
+    username: ${LAXIMO_USERNAME:}
+    password: ${LAXIMO_PASSWORD:}
+    # Laximo market / country code (ISO-3166, e.g. RU, DE, US)
+    market: ${LAXIMO_MARKET:RU}
+    # Laximo internal trade account id used in every request header
+    tradeId: ${LAXIMO_TRADE_ID:}
+    connect-timeout-ms: 8000
+    read-timeout-ms: 20000
+
+  abcp:
+    # ABCP.ru / Emex compatible REST API (test environment)
+    api-key: ${ABCP_API_KEY:}
+    base-url: ${ABCP_BASE_URL:https://api.abcp.ru}
+    # Test env of the customer is provisioned by the integrator
+    enabled: ${ABCP_ENABLED:true}
+
+  cache:
+    # Caching strategy: Laximo charges per request, so every expensive call is
+    # cached with a TTL tuned by data volatility.
+    enabled: ${CACHE_ENABLED:true}
+    ttl:
+      vin-decode: ${CACHE_TTL_VIN:72h}      # VIN -> vehicle identity, never changes
+      brands: ${CACHE_TTL_BRANDS:720h}      # brand dictionary, 30 days
+      models: ${CACHE_TTL_MODELS:336h}      # model dictionary, 14 days
+      modifications: ${CACHE_TTL_MODS:336h} # year/modification lists
+      catalog: ${CACHE_TTL_CATALOG:168h}    # part group / detail tree, 7 days
+      oem-search: ${CACHE_TTL_OEM:24h}      # OEM -> cross numbers, 1 day
+      cross: ${CACHE_TTL_CROSS:6h}         # cross-references change often
+    key-prefix: ${CACHE_PREFIX:autoparts:}
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.autoparts.hub: ${LOG_LEVEL:INFO}
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [%thread] %logger{28} - %msg%n"

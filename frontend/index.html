@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Autoparts Widgets — подбор запчастей по VIN, каталог и OEM-поиск (Laximo + ABCP)</title>
+    <meta
+      name="description"
+      content="Демонстрация виджетов подбора автозапчастей: поиск по VIN, каталог по автомобилю, поиск по OEM-номеру. Интеграция Laximo и ABCP, кэширование в Redis."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles/base.css" />
+    <link rel="stylesheet" href="/src/styles/widgets.css" />
+    <link rel="stylesheet" href="/src/styles/demo.css" />
+  </head>
+  <body>
+    <div class="dx-bg" aria-hidden="true"></div>
+
+    <header class="dx-header">
+      <div class="dx-shell dx-header__inner">
+        <a class="dx-logo" href="#top">
+          <span class="dx-logo__mark" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 17h14M6 17v2M18 17v2M4 13l1.6-4.6A2 2 0 0 1 7.5 7h9a2 2 0 0 1 1.9 1.4L20 13v4H4z" />
+              <path d="M4 13h16" />
+            </svg>
+          </span>
+          <span class="dx-logo__text">
+            <strong>Autoparts Widgets</strong>
+            <small>Laximo · ABCP · Spring Boot · Redis</small>
+          </span>
+        </a>
+
+        <nav class="dx-nav" aria-label="Разделы">
+          <a href="#vin">По VIN</a>
+          <a href="#catalog">Каталог</a>
+          <a href="#oem">OEM-поиск</a>
+          <a href="#architecture">Архитектура</a>
+          <a class="dx-nav__cta" href="https://github.com/nanautee/laximo-autoparts-widgets" target="_blank"
+             rel="noopener">GitHub</a>
+        </nav>
+
+        <div id="dx-cart"></div>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- ============================ HERO ============================ -->
+      <section class="dx-hero">
+        <div class="dx-shell dx-hero__inner">
+          <div class="dx-hero__text">
+            <p class="dx-badge">
+              <span class="dx-badge__dot"></span>
+              Референс-реализация · production-ready архитектура
+            </p>
+            <h1 class="dx-hero__title">
+              Виджеты подбора автозапчастей<br />
+              <span class="dx-hero__accent">Laximo + ABCP</span>
+            </h1>
+            <p class="dx-hero__lead">
+              Три встраиваемых виджета: поиск по VIN, каталог по автомобилю и поиск по OEM-номеру
+              с кросс-номерами. Backend на Spring Boot скрывает ключи Laximo и ABCP, нормализует ответы
+              под интерфейс и кэширует их в Redis, чтобы не платить за каждый повторный запрос.
+            </p>
+
+            <div class="dx-hero__actions">
+              <a class="dx-btn dx-btn--primary" href="#vin">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+                Попробовать виджеты
+              </a>
+              <a class="dx-btn dx-btn--ghost" href="https://github.com/nanautee/laximo-autoparts-widgets"
+                 target="_blank" rel="noopener">Открыть репозиторий</a>
+            </div>
+
+            <dl class="dx-stats">
+              <div><dt>Кэш повторных VIN-запросов</dt><dd>72 часа</dd></div>
+              <div><dt>Кросс-номера</dt><dd>6 часов TTL</dd></div>
+              <div><dt>Ответ API</dt><dd>&lt; 80 мс</dd></div>
+              <div><dt>Интеграций</dt><dd>SOAP + REST</dd></div>
+            </dl>
+          </div>
+
+          <aside class="dx-hero__panel">
+            <div class="dx-terminal">
+              <div class="dx-terminal__bar">
+                <span class="dx-terminal__dot"></span><span class="dx-terminal__dot"></span
+                ><span class="dx-terminal__dot"></span>
+                <span class="dx-terminal__title">POST /api/v1/cart/add</span>
+              </div>
+              <pre class="dx-terminal__code"><code><span class="t-key">// запрос, который уходит в ABCP</span>
+{
+  <span class="t-key">"sessionId"</span>: <span class="t-str">"wp-8f2a1c"</span>,
+  <span class="t-key">"clientType"</span>: <span class="t-str">"WWW"</span>,
+  <span class="t-key">"items"</span>: [{
+    <span class="t-key">"oem"</span>: <span class="t-str">"34116860114"</span>,
+    <span class="t-key">"brand"</span>: <span class="t-str">"BMW"</span>,
+    <span class="t-key">"name"</span>: <span class="t-str">"Диск тормозной задний"</span>,
+    <span class="t-key">"quantity"</span>: <span class="t-num">1</span>,
+    <span class="t-key">"price"</span>: <span class="t-num">6240</span>,
+    <span class="t-key">"reference"</span>: <span class="t-str">"laximo:VF-318I-2008"</span>
+  }]
+}</code></pre>
+            </div>
+            <ul class="dx-checks">
+              <li>Ключи Laximo и ABCP не покидают backend</li>
+              <li>Каждый ответ помечен <code>X-Cache: HIT|MISS</code></li>
+              <li>Ошибки Laximo не ломают виджет — есть состояния загрузки и пустоты</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============================ TABS ============================ -->
+      <div class="dx-shell">
+        <div class="dx-tabs" role="tablist" aria-label="Виджеты">
+          <button class="dx-tab is-active" role="tab" data-tab="vin" aria-selected="true">
+            <span class="dx-tab__num">1</span> По VIN
+          </button>
+          <button class="dx-tab" role="tab" data-tab="catalog" aria-selected="false">
+            <span class="dx-tab__num">2</span> Каталог по авто
+          </button>
+          <button class="dx-tab" role="tab" data-tab="oem" aria-selected="false">
+            <span class="dx-tab__num">3</span> По OEM-номеру
+          </button>
+        </div>
+      </div>
+
+      <section class="dx-shell dx-section" id="vin">
+        <div id="panel-vin" class="dx-panel" role="tabpanel"></div>
+      </section>
+
+      <section class="dx-shell dx-section is-hidden" id="catalog">
+        <div id="panel-catalog" class="dx-panel" role="tabpanel"></div>
+      </section>
+
+      <section class="dx-shell dx-section is-hidden" id="oem">
+        <div id="panel-oem" class="dx-panel" role="tabpanel"></div>
+      </section>
+
+      <!-- ======================== ARCHITECTURE ======================== -->
+      <section class="dx-shell dx-section" id="architecture">
+        <div class="dx-cards">
+          <article class="dx-card">
+            <span class="dx-card__icon dx-card__icon--violet">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                   stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2" />
+                <path d="M10 2v4M14 2v4M10 18v4M14 18v4M2 10h4M2 14h4M18 10h4M18 14h4" /></svg>
+            </span>
+            <h3>Backend-прокси вместо прямых вызовов</h3>
+            <p>
+              Виджеты ходят только в наш API. Он прячет учётные данные Laximo и ABCP, приводит SOAP-ответы
+              к плоским DTO и добавляет кэш. Ключи не покидают сервер, а интеграция с ABCP
+              переключается одной переменной окружения — без правок во фронтенде.
+            </p>
+          </article>
+
+          <article class="dx-card">
+            <span class="dx-card__icon dx-card__icon--amber">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                   stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3" />
+                <path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" /></svg>
+            </span>
+            <h3>Redis с TTL по волатильности данных</h3>
+            <p>
+              Laximo тарифицирует каждый SOAP-вызов, поэтому сроки жизни кэша заданы осознанно:
+              VIN — 72 часа, справочники марок — 30 дней, дерево каталога — 7 дней,
+              кросс-номера — 6 часов. Ключи хэшируются, попадание видно в ответе.
+            </p>
+          </article>
+
+          <article class="dx-card">
+            <span class="dx-card__icon dx-card__icon--green">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                   stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4" />
+                <circle cx="18" cy="20" r="1.4" /><path d="M2 3h2.2l2.3 12.2a2 2 0 0 0 2 1.6h9.1a2 2 0 0 0 2-1.6L21 7H5" /></svg>
+            </span>
+            <h3>Передача в корзину ABCP</h3>
+            <p>
+              «В корзину» собирает позиции с OEM-номером, backend формирует тело запроса ABCP и
+              отправляет его в тестовую среду. Ответ возвращает точный JSON запроса — контракт
+              интеграции можно сверить с документацией заказчика без чтения кода.
+            </p>
+          </article>
+
+          <article class="dx-card">
+            <span class="dx-card__icon dx-card__icon--blue">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                   stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5z" /><path d="m3 13 9 5 9-5" /></svg>
+            </span>
+            <h3>Ленивое дерево каталога</h3>
+            <p>
+              Полное дерево деталей одного автомобиля — тысячи узлов, поэтому виджет подгружает
+              уровень за уровнем. Отдача от первого байта до карточки детали остаётся быстрой,
+              а уже загруженные уровни не перезапрашиваются.
+            </p>
+          </article>
+        </div>
+
+        <div class="dx-flow">
+          <h2 class="dx-flow__title">Поток запроса</h2>
+          <ol class="dx-flow__steps">
+            <li><span>1</span><strong>Виджет</strong><em>JS, без фреймворка</em></li>
+            <li><span>2</span><strong>Backend API</strong><em>Spring Boot WebFlux</em></li>
+            <li><span>3</span><strong>Redis</strong><em>кэш по типу данных</em></li>
+            <li><span>4</span><strong>Laximo</strong><em>SOAP: VIN, каталог, кроссы</em></li>
+            <li><span>5</span><strong>ABCP</strong><em>REST: корзина</em></li>
+          </ol>
+        </div>
+      </section>
+    </main>
+
+    <footer class="dx-footer">
+      <div class="dx-shell dx-footer__inner">
+        <p>
+          Референс-реализация виджетов подбора автозапчастей. Java 17 · Spring Boot 3 · Redis ·
+          Vanilla TypeScript · Docker · Railway.
+        </p>
+        <p class="dx-footer__links">
+          <a href="https://github.com/nanautee/laximo-autoparts-widgets" target="_blank" rel="noopener">Репозиторий</a>
+          <a href="#architecture">Архитектура</a>
+          <a href="#vin">Виджеты</a>
+        </p>
+      </div>
+    </footer>
+
+    <script type="module">
+      import { mountCartButton } from '/src/core/cart-button.ts';
+      import { mountVinWidget } from '/src/widgets/vin-widget.ts';
+      import { mountCatalogWidget } from '/src/widgets/catalog-widget.ts';
+      import { mountOemWidget } from '/src/widgets/oem-widget.ts';
+
+      // `VITE_API_BASE` points the demo at a deployed backend; left unset the
+      // widgets call the same origin, which is what local development wants.
+      window.__AUTOPARTS_CONFIG__ = window.__AUTOPARTS_CONFIG__ || {};
+      if (!window.__AUTOPARTS_CONFIG__.apiBase && import.meta.env.VITE_API_BASE) {
+        window.__AUTOPARTS_CONFIG__.apiBase = import.meta.env.VITE_API_BASE;
+      }
+
+      mountCartButton(document.getElementById('dx-cart'));
+
+      // Each widget mounts lazily when its tab is opened, so the first paint is fast.
+      const mounted = new Set();
+      const panels = {
+        vin: { host: 'panel-vin', mount: (el) => mountVinWidget({ container: el }) },
+        catalog: { host: 'panel-catalog', mount: (el) => mountCatalogWidget({ container: el }) },
+        oem: { host: 'panel-oem', mount: (el) => mountOemWidget({ container: el }) },
+      };
+
+      function activate(name) {
+        for (const [key, panel] of Object.entries(panels)) {
+          document.getElementById(key)?.classList.toggle('is-hidden', key !== name);
+        }
+        if (mounted.has(name)) return;
+        const el = document.getElementById(panels[name].host);
+        if (el) {
+          panels[name].mount(el);
+          mounted.add(name);
+        }
+      }
+
+      document.querySelectorAll('.dx-tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.dx-tab').forEach((t) => {
+            t.classList.toggle('is-active', t === tab);
+            t.setAttribute('aria-selected', String(t === tab));
+          });
+          const name = tab.dataset.tab;
+          if (name) {
+            activate(name);
+            history.replaceState(null, '', '#' + name);
+          }
+        });
+      });
+
+      const initial = location.hash.replace('#', '');
+      if (panels[initial]) {
+        document.querySelector(`.dx-tab[data-tab="${initial}"]`)?.click();
+      } else {
+        activate('vin');
+      }
+    </script>
+  </body>
+</html>

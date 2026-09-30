@@ -1,0 +1,17 @@
+{
+  "name": "autoparts-widgets",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Embeddable Laximo-powered auto parts lookup widgets (VIN, catalog, OEM) with ABCP cart integration",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
+  }
+}
