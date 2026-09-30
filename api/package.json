@@ -7,6 +7,7 @@
   "scripts": {
     "test": "node contract.test.mjs && node invariants.test.mjs",
     "test:contract": "node contract.test.mjs",
-    "test:invariants": "node invariants.test.mjs"
+    "test:invariants": "node invariants.test.mjs",
+    "dev": "netlify dev --dir ."
   }
 }

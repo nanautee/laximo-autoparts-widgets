@@ -1,4 +1,4 @@
-import { handler } from '../netlify/functions/api.js';
+﻿import { handler } from '../api/handler.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
@@ -18,7 +18,7 @@ const call = async (httpMethod, url, body) => {
 };
 
 (async () => {
-  const fixture = JSON.parse(readFileSync(new URL('../netlify/functions/_fixture.json', import.meta.url), 'utf8'));
+  const fixture = JSON.parse(readFileSync(new URL('../api/_fixture.json', import.meta.url), 'utf8'));
 
   console.log('fixture integrity');
   check('every catalogTemplate key is reachable from ROOT', () => {
