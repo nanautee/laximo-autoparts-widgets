@@ -92,10 +92,6 @@ function resolveMockMode(): 'auto' | 'always' | 'off' {
   return value === 'always' || value === 'off' ? value : 'auto';
 }
 
-export function getMockMode(): 'auto' | 'always' | 'off' {
-  return resolveMockMode();
-}
-
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const url = `${getApiBaseUrl()}${path}`;
   const controller = new AbortController();
