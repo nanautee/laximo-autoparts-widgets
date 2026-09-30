@@ -1,5 +1,5 @@
 ﻿import assert from 'node:assert/strict';
-import { handler } from '../api/handler.mjs';
+import { handler } from '../frontend/api/handler.mjs';
 
 const BASE = 'http://localhost:8080';
 
