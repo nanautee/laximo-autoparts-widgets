@@ -1,12 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "vite",
-  "functions": {
-    "api/index.js": {
-      "runtime": "nodejs22.x"
-    },
-    "api/[[...path]].js": {
-      "runtime": "nodejs22.x"
-    }
-  }
+  "framework": "vite"
 }

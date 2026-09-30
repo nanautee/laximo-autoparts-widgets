@@ -6,6 +6,10 @@ node_modules/
 *.jar
 !.mvn/wrapper/maven-wrapper.jar
 
+# Vercel / Netlify local state and build output
+.vercel/
+.netlify/
+
 # Dependencies / caches
 .mvn/
 node_modules/
