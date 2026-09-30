@@ -1,0 +1,12 @@
+{
+  "name": "@autoparts/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Serverless mock of the autoparts API, contract-identical to the Spring Boot backend",
+  "scripts": {
+    "test": "node contract.test.mjs && node invariants.test.mjs",
+    "test:contract": "node contract.test.mjs",
+    "test:invariants": "node invariants.test.mjs"
+  }
+}
